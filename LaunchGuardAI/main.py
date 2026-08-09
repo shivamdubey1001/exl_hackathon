@@ -537,6 +537,37 @@ def _cache_put(did: str, key: str, val: dict):
               "w", encoding="utf-8") as f:
         json.dump(val, f, indent=2, default=str)
 
+def _record_run(did: str, key: str, kind: str, label: str, headline: str):
+    """Append to a per-dataset run index so the UI can list past results."""
+    p = ds_path(did, "runs.json")
+    runs = []
+    if os.path.exists(p):
+        try:
+            runs = json.load(open(p, encoding="utf-8"))
+        except Exception:
+            runs = []
+    runs = [r for r in runs if r.get("key") != key]      # dedupe reruns
+    runs.insert(0, {"key": key, "kind": kind, "label": label,
+                    "headline": headline,
+                    "at": datetime.now(timezone.utc).isoformat()})
+    with open(p, "w", encoding="utf-8") as f:
+        json.dump(runs[:60], f, indent=2)                 # keep the last 60
+
+@app.get("/api/datasets/{did}/runs")
+def list_runs(did: str):
+    p = ds_path(did, "runs.json")
+    if not os.path.exists(p):
+        return {"runs": []}
+    return {"runs": json.load(open(p, encoding="utf-8"))}
+
+
+@app.get("/api/datasets/{did}/runs/{key}")
+def get_run(did: str, key: str):
+    hit = _cache_get(did, os.path.basename(key))
+    if not hit:
+        raise HTTPException(404, "that run is no longer cached")
+    hit["_cached"] = True
+    return hit
 
 @app.post("/api/datasets/{did}/simulate/intervention")
 def simulate_intervention(did: str, body: InterventionBody):
@@ -596,6 +627,9 @@ def simulate_intervention(did: str, body: InterventionBody):
                              "targeted_totals": analyst["targeted"]["totals"]},
               "reactions": reactions, "ranking_check": ranking, "_cached": False}
     _cache_put(did, key, result)
+    _cache_put(did, key, result)
+    _record_run(did, key, "intervention", run["intervention"]["label"],
+                f"net {round(run['totals']['net_profit_impact']):,}")
     return result
 
 
@@ -629,6 +663,11 @@ def simulate_abtest(did: str, body: ABBody):
 
     result["_cached"] = False
     _cache_put(did, key, result)
+    _cache_put(did, key, result)
+    lift = result.get("overall_summary", {}).get("rpu_relative_lift_pct", 0)
+    _record_run(did, key, "aatest" if body.aa_test else "abtest",
+                "A/A noise check" if body.aa_test else body.variant_b[:60],
+                f"{lift:+.1f}% RPU")
     return result
 
 

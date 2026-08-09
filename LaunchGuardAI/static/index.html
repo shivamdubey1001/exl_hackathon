@@ -583,6 +583,7 @@ function renderIntervention(a){
         <button class="ghost" id="live">Run live</button>
       </div>
       <div id="out"></div>
+      <div id="history"></div>
     </div>`;
   $("#presets").querySelectorAll(".preset").forEach(b=>b.onclick=()=>{
     S.preset=+b.dataset.i;
@@ -590,6 +591,7 @@ function renderIntervention(a){
   });
   $("#go").onclick=()=>runInterv(a,false);
   $("#live").onclick=()=>runInterv(a,true);
+  renderHistory(["intervention"]);  
 }
 
 async function runInterv(a,live){
@@ -602,8 +604,39 @@ async function runInterv(a,live){
       {method:"POST",body:JSON.stringify({kind:p.kind,magnitude:p.magnitude,label:p.label,force_live:live})});
     showInterv(r);
   }catch(e){ $("#out").innerHTML=`<div class="msg bad"><b>Failed.</b><br>${esc(e.message)}</div>`; }
+  renderHistory(["intervention"]);
   S.busy=false;
 }
+
+async function renderHistory(kinds){
+  try{
+    const {runs} = await api(`/api/datasets/${S.ds.dataset_id}/runs`);
+    const mine = runs.filter(r=>kinds.includes(r.kind));
+    const el = $("#history"); if(!el) return;
+    if(!mine.length){ el.innerHTML=""; return; }
+    el.innerHTML = `<div class="section-head" style="margin-top:26px">
+        <h3>Earlier runs</h3><span class="note">${mine.length} saved</span></div>
+      <div class="grid three">${mine.slice(0,9).map(r=>`
+        <div class="card pick" data-run="${r.key}">
+          <h4 style="font-size:14px">${esc(r.label)}</h4>
+          <div class="chips"><span class="chip">${esc(r.headline)}</span>
+            <span class="chip">${new Date(r.at).toLocaleString([], 
+              {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})}</span></div>
+        </div>`).join("")}</div>`;
+    el.querySelectorAll("[data-run]").forEach(c=>c.onclick=()=>loadRun(c.dataset.run));
+  }catch(e){ /* history is optional */ }
+}
+
+async function loadRun(key){
+  $("#out").innerHTML = `<div class="msg"><div class="working">
+    <span class="pulse"></span>Loading that run…</div></div>`;
+  try{
+    const r = await api(`/api/datasets/${S.ds.dataset_id}/runs/${key}`);
+    r.overall_summary ? showAB(r, r.config?.aa_test) : showInterv(r);
+    $("#out").scrollIntoView({behavior:"smooth", block:"start"});
+  }catch(e){ $("#out").innerHTML=`<div class="msg bad">${esc(e.message)}</div>`; }
+}
+
 
 function showInterv(r){
   const t=r.totals,c=r.comparison||{},sv=c.savings||{};
@@ -685,6 +718,7 @@ function renderAB(a){
     </div>`;
   $("#go").onclick=()=>runAB(false);
   $("#aa").onclick=()=>runAB(true);
+  renderHistory(["abtest","aatest"]);
 }
 
 async function runAB(aa){
@@ -697,6 +731,7 @@ async function runAB(aa){
                            aa_test:aa, force_live:aa})});
     showAB(r,aa);
   }catch(e){ $("#out").innerHTML=`<div class="msg bad"><b>Failed.</b><br>${esc(e.message)}</div>`; }
+  renderHistory(["abtest","aatest"]);
   S.busy=false;
 }
 
