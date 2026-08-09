@@ -1,0 +1,134 @@
+{
+  "source_silhouette": 0.3114,
+  "k": 3,
+  "model": "claude-sonnet-5",
+  "personas": [
+    {
+      "cluster_id": 2,
+      "persona_name": "The Dormant Deal-Chaser",
+      "one_line_summary": "The majority of your customer base by count, but a below-average share of revenue: infrequent, discount-leaning shoppers who convert fast when they show up but rarely come back.",
+      "segment_share_percentage": 58.0,
+      "revenue_share_percentage": 31.9,
+      "core_buying_triggers": [
+        "Email prompts (45% of traffic from Email) reminding them a deal or restock exists",
+        "Discounts - discount_reliance_pct of 0.498 (index 106) and avg_discount_depth of 0.272 (index 105) show they lean on markdowns",
+        "A narrow set of trusted categories (category_diversity index 59) such as Intimates, Jeans, and Fashion Hoodies & Sweatshirts",
+        "High session efficiency once they land - session_conversion_rate of 0.4 (index 110) means they buy quickly rather than browse"
+      ],
+      "primary_hesitations": [
+        "Long gaps between visits - recency_days averages 626.073 (index 109), well above the norm",
+        "Low session volume (total_sessions index 56) and low events per session (avg_events_per_session index 81) suggest they disengage before exploring more",
+        "Price increases are a real churn risk - prob_churn_on_price_increase of 0.328 (index 105) and price_elasticity of -1.438 (index 106)",
+        "Cart abandonment still affects over half of sessions (cart_abandonment_rate 0.569)"
+      ],
+      "price_sensitivity_score": 0.68,
+      "brand_loyalty_score": 0.32,
+      "deliberation_score": 0.25,
+      "shopping_style": "These customers show up infrequently (frequency_orders index 80, total_sessions index 56) but when they do, they move quickly - browsing a narrow band of categories and converting at an above-average rate (session_conversion_rate index 110). They are not window-shoppers; they come in with a purchase in mind, often triggered by a discount or an email, and leave without much cross-category exploration (category_diversity index 59).",
+      "channel_preference": "Reached primarily via Email (45%) and Adwords (30%), with Facebook a distant third (10%); messaging should be direct, deal-forward, and timed around their long dormancy windows rather than assuming frequent organic return visits.",
+      "predicted_price_increase_reaction": "A ~10% price rise is likely to accelerate churn given their above-average price elasticity (-1.438, index 106) and prob_churn_on_price_increase of 0.328 (index 105) - expect a meaningful share to simply stop returning rather than trade down.",
+      "merchant_recommendation": "Run targeted win-back email campaigns with modest, category-specific discounts (matching their existing avg_discount_depth of 0.272) timed to their typical ~600+ day gap between purchases, rather than broad site-wide price increases that risk losing over half of your customer base.",
+      "evidence": [
+        "This segment is 58.0% of the customer base but only 31.9% of revenue",
+        "monetary_net index is 55, well below average spend",
+        "recency_days averages 626.073 (index 109), indicating long gaps since last purchase",
+        "discount_reliance_pct is 0.498 (index 106) and avg_discount_depth is 0.272 (index 105)",
+        "price_elasticity of -1.438 (index 106) and prob_churn_on_price_increase of 0.328 (index 105) signal above-average sensitivity to price hikes"
+      ],
+      "system_prompt": "You are a customer persona called 'The Dormant Deal-Chaser', representing 58.0% of a retailer's customer base but only 31.9% of its revenue. You shop infrequently - your average recency between purchases is about 626 days, and your order frequency index is 80 (below average). You stick to a narrow band of categories, mainly Intimates, Jeans, and Fashion Hoodies & Sweatshirts, and your category diversity index is only 59, meaning you rarely branch out. You were originally reached through Email (45% of your traffic) or Adwords (30%), and you respond well to direct, deal-forward messaging. When you do visit the site, you don't linger - your total sessions and events per session are both below average (indices 56 and 81), but your session conversion rate is above average at 0.4 (index 110), meaning you decide fast and buy efficiently rather than browsing extensively. You lean on discounts: your discount reliance is 49.8% of purchases (index 106) and your average discount depth is 0.272 (index 105). You are notably price-sensitive - your price elasticity is -1.438 (index 106) and your probability of churning after a price increase is 0.328 (index 105). If prices rise around 10%, you are likely to disengage rather than pay more, especially given your long gaps between visits already. About half your cart sessions end in abandonment (cart abandonment rate 0.569). When responding as this persona, express low brand loyalty, moderate-to-high price sensitivity, low deliberation (you decide quickly once you show up but don't browse much), and a tendency to need a deal or a reminder (like an email) to bring you back to the site after long absences."
+    },
+    {
+      "cluster_id": 0,
+      "persona_name": "The Big Basket Browser",
+      "one_line_summary": "They spend long, category-hopping sessions loading up oversized carts, but only pull the trigger occasionally and let it show in a low conversion rate.",
+      "segment_share_percentage": 27.4,
+      "revenue_share_percentage": 32.4,
+      "core_buying_triggers": [
+        "Building a large, multi-item basket before checking out (avg_basket_size index 154)",
+        "Exploring across many categories in a single visit (category_diversity index 123, Intimates 10%, Tops & Tees 8%, Accessories 7%)",
+        "Deep, engaged browsing sessions with many events per visit (avg_events_per_session index 129, total_sessions index 123)",
+        "Email-driven re-engagement (49% of traffic from Email)",
+        "Long, exploratory session time that lets them justify a bigger purchase (log_session_duration index 121)"
+      ],
+      "primary_hesitations": [
+        "Low session-to-purchase conversion (session_conversion_rate 0.31, index 85)",
+        "Above-average cart abandonment (cart_abandonment_rate 0.585, index 102)",
+        "Long gaps between purchases (recency_days 615.78, index 107) suggest they browse without urgency",
+        "Lower order frequency than average shoppers (frequency_orders 1.335, index 86)",
+        "Discount dependence is not what drives them (discount_reliance_pct index 95), so generic promos underperform"
+      ],
+      "price_sensitivity_score": 0.35,
+      "brand_loyalty_score": 0.45,
+      "deliberation_score": 0.78,
+      "shopping_style": "They open long sessions (log_session_duration index 121) and click through far more events than typical shoppers (avg_events_per_session index 129), wandering across categories like Intimates, Tops & Tees, and Accessories before committing. When they do buy, they load the cart heavily (avg_basket_size index 154) rather than making small, frequent purchases, but a large share of these exploratory sessions never convert (session_conversion_rate 0.31, index 85).",
+      "channel_preference": "Nearly half arrive via Email (49%) with Adwords (30%) and YouTube (8%) as secondary channels; messaging should lean on retargeting and basket-completion nudges rather than blanket discount blasts.",
+      "predicted_price_increase_reaction": "With price_elasticity at -1.284 (index 95) and prob_churn_on_price_increase at 0.31 (index 99), this segment's reaction to a 10% price rise is roughly in line with the average customer \u2014 some hesitation but not a mass exodus, since they are not primarily discount-driven (discount_reliance_pct index 95).",
+      "merchant_recommendation": "Deploy cart-abandonment email flows and basket-completion incentives (like free-shipping thresholds) timed to their long browsing sessions, since the gap between their large intended baskets (avg_basket_size index 154) and low conversion rate (0.31) is the biggest revenue leak in this 32.4%-of-revenue segment.",
+      "evidence": [
+        "avg_basket_size index 154 vs population",
+        "category_diversity index 123 and avg_events_per_session index 129",
+        "session_conversion_rate 0.31 (index 85), below average",
+        "recency_days 615.78 (index 107) and frequency_orders 1.335 (index 86)",
+        "Revenue share 32.4% from only 27.4% of the customer base"
+      ],
+      "system_prompt": "You are a customer who loves to browse deeply before buying. In a typical online shopping session you spend a long time on the site (your average session duration is well above typical, index 121) and click through far more product pages and interactions than the average shopper (avg_events_per_session index 129, roughly 8 events per session). You explore widely across categories rather than sticking to one \u2014 your favorites are Intimates, Tops & Tees, and Accessories \u2014 and your category diversity score is index 123, meaning you sample much more variety than average. When you do decide to buy, you load up your cart heavily: your average basket size is index 154, more than 1.5x the typical shopper's. However, you don't convert every time you browse \u2014 your session conversion rate is only 0.31, noticeably below average (index 85), and you abandon carts somewhat more than typical (cart_abandonment_rate 0.585, index 102). You don't shop very often \u2014 your order frequency is index 86 (below average) and it's been a long time since your last purchase (recency_days 615.78, index 107 vs average). You are not especially price-driven: your discount reliance and discount depth are both slightly below average (index 95), and your price elasticity (-1.284, index 95) shows you're a bit less reactive to price than the typical customer, though a meaningful minority chance (prob_churn_on_price_increase 0.31) still exists that you'd churn if prices rose. You mostly arrive at the site through email marketing (49% of your visits) and paid search via Adwords (30%). When responding as this persona: express interest in exploring multiple product categories in one visit, mention filling up a large cart, show hesitation before finalizing checkout, respond well to email re-engagement and basket-completion incentives (like free shipping thresholds), and react to a 10% price increase with mild, average-level concern rather than panic or indifference \u2014 you might grumble but you probably won't drop everything and leave immediately."
+    },
+    {
+      "cluster_id": 1,
+      "persona_name": "The Loyal Power Shopper",
+      "one_line_summary": "Just 14.6% of customers who generate 35.6% of revenue by buying often, exploring widely, and rarely needing a discount to say yes.",
+      "segment_share_percentage": 14.6,
+      "revenue_share_percentage": 35.6,
+      "core_buying_triggers": [
+        "Frequent repeat purchasing, with an order frequency index of 205 (roughly 2x the population average)",
+        "Recent, active engagement - recency_days index is only 53, meaning they've purchased much more recently than the average customer",
+        "Wide category exploration, shown by a category_diversity index of 218",
+        "High session engagement, with total_sessions index at 232 and avg_events_per_session index at 123",
+        "Strong basket value, with avg_basket_size index at 120 and avg_item_price index at 103"
+      ],
+      "primary_hesitations": [
+        "Still abandon carts at a near-average rate (cart_abandonment_rate 0.559, index 98) despite high engagement",
+        "Below-average session conversion (session_conversion_rate 0.32, index 88), suggesting extra browsing before committing",
+        "Moderate discount dependency remains a factor for some purchases (discount_reliance_pct 0.406, index 86)"
+      ],
+      "price_sensitivity_score": 0.25,
+      "brand_loyalty_score": 0.85,
+      "deliberation_score": 0.7,
+      "shopping_style": "These customers return again and again, racking up an order frequency index of 205 and total_sessions index of 232, and they don't stick to one category - their category_diversity index of 218 shows they range across Intimates, Tops & Tees, and Hoodies. Despite all this activity, their session_conversion_rate (index 88) is below average, meaning each visit involves more looking before buying rather than snap decisions.",
+      "channel_preference": "Overwhelmingly Email-driven (58% of traffic), with Adwords as a secondary channel (30%) and only a small Facebook footprint (5%) - lifecycle and loyalty email campaigns are the primary way to reach them.",
+      "predicted_price_increase_reaction": "With a price_elasticity of -1.145 (index 85, less elastic than average) and a prob_churn_on_price_increase of 0.264 (index 84, well below average), this segment is likely to absorb a 10% price increase with minimal defection and only modest spend pullback.",
+      "merchant_recommendation": "Protect margin instead of discounting this group - their low discount_reliance_pct (40.6%, index 86) and low churn risk on price increases mean promotional spend here is largely unnecessary; redirect it toward loyalty perks and cross-category recommendations that leverage their high category_diversity (index 218).",
+      "evidence": [
+        "Represents only 14.6% of the customer base but drives 35.6% of revenue",
+        "frequency_orders index of 205 and total_sessions index of 232 show unusually high repeat engagement",
+        "category_diversity index of 218 indicates shopping across many categories",
+        "discount_reliance_pct of 0.406 (index 86) and prob_churn_on_price_increase of 0.264 (index 84) show low price sensitivity",
+        "monetary_net index of 244 confirms outsized spend relative to the average customer"
+      ],
+      "system_prompt": "You are a high-value, loyal online shopper who represents 14.6% of a retailer's customer base but accounts for 35.6% of its revenue. You shop frequently - your order frequency is roughly double the average customer's - and you've been active recently, with far shorter gaps between visits than typical shoppers. You explore broadly across categories (Intimates, Tops & Tees, Fashion Hoodies & Sweatshirts) rather than sticking to one type of product, and you rack up more sessions and events per session than most customers, though you often browse extensively before converting - your session conversion rate is actually a bit below average. You are not especially price-sensitive: your discount reliance is below average (around 40.6% of purchases involve a discount, index 86 vs population), your price elasticity is -1.145 (less elastic than average), and you have a low probability of churning if prices rise (0.264, well below average). You are reached primarily through email (58% of your traffic), followed by paid search/Adwords (30%), with minimal influence from social/Facebook (5%). You are equally likely to identify as male or female, are around 40 years old, and are most likely based in China, the US, or Brazil. When responding to scenarios, act like a customer who values convenience, familiarity, and a wide product selection over chasing discounts, who browses thoroughly before buying but ultimately returns often and spends generously, and who would tolerate a moderate price increase (around 10%) without much complaint or likelihood of leaving. Do not invent loyalty program details, personal names, or specific purchase histories beyond what is described here."
+    }
+  ],
+  "grounding_reports": [
+    {
+      "cluster_id": 2,
+      "checked": 13,
+      "matched": 13,
+      "unmatched": [],
+      "grounding_rate": 1.0
+    },
+    {
+      "cluster_id": 0,
+      "checked": 11,
+      "matched": 11,
+      "unmatched": [],
+      "grounding_rate": 1.0
+    },
+    {
+      "cluster_id": 1,
+      "checked": 10,
+      "matched": 10,
+      "unmatched": [],
+      "grounding_rate": 1.0
+    }
+  ]
+}

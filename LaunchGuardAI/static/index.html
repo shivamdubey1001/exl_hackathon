@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LaunchGuard AI — test it on synthetic customers first</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0A0D13; --slate:#121724; --panel:#161C2B; --edge:#242D42;
+  --bone:#E9E7E2; --muted:#818DA6; --dim:#5A6478;
+  /* amber = margin leaving the business, mint = margin arriving.
+     Never used decoratively. */
+  --amber:#E0A458; --mint:#5FCFA8; --blood:#C4574B;
+  --display:'Archivo',system-ui,sans-serif;
+  --body:'IBM Plex Sans',system-ui,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--ink);color:var(--bone);font-family:var(--body);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+button{background:none;border:none;cursor:pointer}
+:focus-visible{outline:2px solid var(--mint);outline-offset:3px;border-radius:2px}
+
+.shell{display:grid;grid-template-columns:270px 1fr;min-height:100vh}
+.rail{background:var(--slate);border-right:1px solid var(--edge);padding:26px 20px;display:flex;flex-direction:column;gap:24px}
+.brand{display:flex;align-items:center;gap:11px}
+.mark{width:38px;height:38px;border-radius:9px;flex:none;background:linear-gradient(150deg,var(--amber),var(--blood));display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:15px;color:#12060A}
+.brand h1{font-family:var(--display);font-weight:800;font-size:17px;letter-spacing:-.02em}
+.brand p{font-size:10.5px;color:var(--dim);font-family:var(--mono)}
+.eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-bottom:10px}
+.rail-group{display:flex;flex-direction:column;gap:4px}
+.tile{display:flex;flex-direction:column;gap:2px;text-align:left;padding:10px 12px;border-radius:9px;border:1px solid transparent;transition:background .16s}
+.tile:hover:not(:disabled){background:#1A2132}
+.tile:disabled{opacity:.35;cursor:not-allowed}
+.tile[aria-current="true"]{background:var(--panel);border-color:var(--edge)}
+.tile[aria-current="true"] .tile-name{color:var(--amber)}
+.tile-name{font-weight:600;font-size:13.5px}
+.tile-blurb{font-size:11px;color:var(--dim);line-height:1.35}
+.rail-foot{margin-top:auto;display:flex;flex-direction:column;gap:7px}
+.stat{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--dim)}
+.stat b{color:var(--muted);font-weight:500}
+.dot{width:6px;height:6px;border-radius:50%;display:inline-block;margin-right:6px}
+.dot.on{background:var(--mint)} .dot.off{background:var(--blood)}
+
+.main{padding:40px 48px 72px;max-width:1200px}
+.hero h2{font-family:var(--display);font-weight:800;font-size:clamp(30px,4vw,50px);line-height:1.03;letter-spacing:-.035em;max-width:17ch}
+.hero h2 em{font-style:normal;color:var(--amber)}
+.hero .lede{margin-top:16px;max-width:58ch;color:var(--muted);font-size:16px}
+.section{margin-top:34px}
+.section-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:15px;padding-bottom:10px;border-bottom:1px solid var(--edge)}
+.section-head h3{font-family:var(--display);font-weight:600;font-size:16.5px}
+.section-head .note{font-family:var(--mono);font-size:11px;color:var(--dim)}
+
+/* steps */
+.steps{display:flex;gap:6px;margin-bottom:26px;flex-wrap:wrap}
+.step{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--dim);padding:6px 11px;border-radius:99px;border:1px solid var(--edge)}
+.step[data-on="true"]{color:var(--amber);border-color:#3A2E1E;background:#1A1409}
+.step[data-done="true"]{color:var(--mint);border-color:#1D3A31}
+.step b{font-weight:500}
+
+.grid{display:grid;gap:13px}
+.grid.three{grid-template-columns:repeat(auto-fit,minmax(265px,1fr))}
+.grid.two{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+.card{background:var(--panel);border:1px solid var(--edge);border-radius:13px;padding:19px;animation:rise .35s cubic-bezier(.2,.7,.3,1) backwards}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}}
+.card h4{font-family:var(--display);font-weight:600;font-size:15.5px;margin-bottom:4px}
+.card .sub{font-size:13px;color:var(--muted)}
+.card.pick{cursor:pointer;transition:border-color .16s}
+.card.pick:hover{border-color:var(--muted)}
+
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.chip{font-family:var(--mono);font-size:10.5px;padding:3px 8px;border-radius:5px;background:#1D2434;color:var(--muted);border:1px solid var(--edge)}
+.chip.amber{color:var(--amber);border-color:#3A2E1E}
+.chip.mint{color:var(--mint);border-color:#1D3A31}
+.chip.red{color:#E0A79E;border-color:#402420}
+
+.bars{margin-top:14px;display:flex;flex-direction:column;gap:8px}
+.bar-row{display:grid;grid-template-columns:92px 1fr 44px;gap:9px;align-items:center}
+.bar-label{font-family:var(--mono);font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.05em}
+.bar-track{height:5px;background:#1D2434;border-radius:3px;overflow:hidden}
+.bar-fill{height:100%;border-radius:3px;min-width:3px;transition:width .7s cubic-bezier(.2,.7,.3,1)}
+.bar-val{font-family:var(--mono);font-size:11px;color:var(--muted);text-align:right}
+
+.controls{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:16px;align-items:center}
+.preset{padding:9px 15px;border-radius:8px;border:1px solid var(--edge);background:var(--panel);font-size:13.5px;font-weight:500;transition:border-color .16s,color .16s}
+.preset:hover{border-color:var(--muted)}
+.preset[aria-pressed="true"]{border-color:var(--amber);color:var(--amber)}
+.run{padding:11px 22px;border-radius:8px;font-weight:600;font-size:14px;background:var(--amber);color:#160D02}
+.run:hover{filter:brightness(1.08)}
+.run:disabled{opacity:.4;cursor:not-allowed}
+.ghost{padding:11px 18px;border-radius:8px;border:1px solid var(--edge);font-size:13.5px;color:var(--muted)}
+.ghost:hover{border-color:var(--muted);color:var(--bone)}
+
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.field label{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+textarea,select,input[type=text]{background:var(--slate);border:1px solid var(--edge);border-radius:9px;padding:11px 13px;color:var(--bone);font-family:var(--body);font-size:14px}
+textarea{resize:vertical;min-height:74px}
+textarea:focus,select:focus{outline:none;border-color:var(--muted)}
+select{cursor:pointer}
+
+/* drop zone */
+.drop{border:1.5px dashed var(--edge);border-radius:13px;padding:34px;text-align:center;transition:border-color .16s,background .16s;cursor:pointer}
+.drop:hover,.drop.over{border-color:var(--amber);background:#171207}
+.drop h4{font-family:var(--display);font-size:16px;margin-bottom:5px}
+.drop p{color:var(--dim);font-size:13px}
+
+/* mapping table */
+.maprow{display:grid;grid-template-columns:1fr 1.1fr 74px;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid #1B2231}
+.maprow:last-child{border-bottom:none}
+.mapname{font-size:13.5px;font-weight:500}
+.mapdesc{font-size:11.5px;color:var(--dim)}
+.conf{font-family:var(--mono);font-size:10.5px;text-align:right}
+.conf.hi{color:var(--mint)} .conf.mid{color:var(--amber)} .conf.lo{color:var(--dim)}
+
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{text-align:left;font-family:var(--mono);font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--dim);font-weight:500;padding:0 11px 9px;border-bottom:1px solid var(--edge)}
+th.num,td.num{text-align:right;font-family:var(--mono)}
+td{padding:10px 11px;border-bottom:1px solid #1B2231}
+tr:last-child td{border-bottom:none}
+.pos{color:var(--mint)} .neg{color:var(--blood)}
+
+/* ledger signature */
+.ledger{background:var(--panel);border:1px solid var(--edge);border-radius:13px;padding:24px 24px 20px;margin-bottom:15px}
+.ledger-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:18px}
+.ledger-head h3{font-family:var(--display);font-weight:600;font-size:16.5px}
+.verdict{font-family:var(--mono);font-size:12.5px}
+.verdict.pos{color:var(--mint)} .verdict.neg{color:var(--blood)}
+.scale{position:relative;height:52px;margin-bottom:8px}
+.scale-track{position:absolute;top:19px;left:0;right:0;height:14px;background:#191F2E;border-radius:3px;overflow:hidden}
+.scale-out,.scale-in{position:absolute;top:0;height:100%;transition:width .8s cubic-bezier(.2,.7,.3,1)}
+.scale-out{right:50%;background:linear-gradient(90deg,#8A5A22,var(--amber));border-radius:3px 0 0 3px}
+.scale-in{left:50%;background:linear-gradient(90deg,var(--mint),#2E7D63);border-radius:0 3px 3px 0}
+.scale-mid{position:absolute;top:12px;left:50%;width:1px;height:28px;background:var(--muted);opacity:.5}
+.scale-cap{position:absolute;top:0;font-family:var(--mono);font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:var(--dim)}
+.scale-cap.l{right:50%;padding-right:9px;text-align:right}
+.scale-cap.r{left:50%;padding-left:9px}
+.scale-fig{position:absolute;top:38px;font-family:var(--mono);font-size:13px}
+.scale-fig.l{right:50%;padding-right:9px;color:var(--amber)}
+.scale-fig.r{left:50%;padding-left:9px;color:var(--mint)}
+.ledger-note{font-size:13px;color:var(--muted);border-top:1px solid var(--edge);padding-top:13px;margin-top:20px}
+.ledger-note b{color:var(--bone);font-weight:600}
+
+.quote{border-left:2px solid var(--amber);padding:2px 0 2px 13px;margin-top:12px;font-size:14.5px}
+.quote cite{display:block;margin-top:5px;font-style:normal;font-family:var(--mono);font-size:10.5px;color:var(--dim)}
+
+.msg{background:var(--panel);border:1px solid var(--edge);border-radius:11px;padding:19px;color:var(--muted);font-size:14px}
+.msg.bad{border-color:#402420;color:#E0A79E}
+.msg.warn{border-color:#3A2E1E;color:var(--amber)}
+.msg b{color:var(--bone)} .msg code{font-family:var(--mono);font-size:12.5px;color:var(--amber)}
+.msg ul{margin:8px 0 0 18px}
+.working{display:flex;align-items:center;gap:11px;color:var(--muted);font-size:14px}
+.pulse{width:7px;height:7px;border-radius:50%;background:var(--amber);animation:pulse 1.1s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.25;transform:scale(.8)}50%{opacity:1;transform:scale(1.15)}}
+.flag{font-family:var(--mono);font-size:11px;color:var(--amber);background:#231A0E;border:1px solid #3A2E1E;border-radius:6px;padding:7px 9px;margin-top:9px}
+
+.progress{height:6px;background:#1D2434;border-radius:3px;overflow:hidden;margin:16px 0 10px}
+.progress span{display:block;height:100%;background:linear-gradient(90deg,var(--amber),var(--mint));transition:width .5s ease}
+
+.kpick{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.kbtn{width:52px;height:52px;border-radius:10px;border:1px solid var(--edge);background:var(--panel);font-family:var(--mono);font-size:17px;display:grid;place-items:center;transition:border-color .16s,color .16s}
+.kbtn:hover{border-color:var(--muted)}
+.kbtn[aria-pressed="true"]{border-color:var(--amber);color:var(--amber)}
+.kbtn small{display:block;font-size:9px;color:var(--dim);margin-top:1px}
+.kbtn[aria-pressed="true"] small{color:var(--amber)}
+
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (max-width:900px){.shell{grid-template-columns:1fr}.rail{border-right:none;border-bottom:1px solid var(--edge)}.main{padding:26px 18px 56px}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="rail">
+    <div class="brand">
+      <div class="mark">LG</div>
+      <div><h1>LaunchGuard AI</h1><p>simulate before you ship</p></div>
+    </div>
+    <div>
+      <div class="eyebrow">Workspace</div>
+      <div class="rail-group" id="rail"></div>
+    </div>
+    <div id="railareas"></div>
+    <div class="rail-foot" id="railfoot"></div>
+  </aside>
+  <main class="main" id="main"></main>
+</div>
+
+<script>
+const API = "";
+const $ = (s,r=document)=>r.querySelector(s);
+const money = n => (n<0?"−":"")+"$"+Math.abs(Math.round(n)).toLocaleString();
+const pct = n => (n>=0?"+":"")+Number(n).toFixed(1)+"%";
+const esc = s => String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+const S = {
+  view:"home", health:null, samples:[], datasets:[], fields:[], areas:[],
+  ds:null,            // active dataset meta
+  mapping:{}, validation:null,
+  kscores:null, k:3,
+  personas:null, area:null, preset:0, busy:false
+};
+
+async function api(path, opts={}){
+  const r = await fetch(API+path, {headers:{"Content-Type":"application/json"}, ...opts});
+  const txt = await r.text();
+  let body; try{ body = JSON.parse(txt); }catch{ body = {detail:txt}; }
+  if(!r.ok) throw new Error(body.detail || r.statusText);
+  return body;
+}
+
+/* ================= boot ================= */
+async function boot(){
+  try{ S.health = await api("/api/health"); }
+  catch{
+    $("#main").innerHTML = `<div class="msg bad"><b>Backend unreachable.</b><br>
+      Start it with <code>python -m uvicorn main:app --reload --port 8000</code>.</div>`;
+    return;
+  }
+  [S.samples, S.datasets, S.fields, S.areas] = await Promise.all([
+    api("/api/samples").then(d=>d.samples).catch(()=>[]),
+    api("/api/datasets").then(d=>d.datasets).catch(()=>[]),
+    api("/api/fields").then(d=>d.fields).catch(()=>[]),
+    api("/api/areas").then(d=>d.areas).catch(()=>[]),
+  ]);
+  renderRail(); renderHome();
+}
+
+function renderRail(){
+  const ready = S.ds && S.ds.status==="ready";
+  $("#rail").innerHTML = `
+    <button class="tile" data-go="home" aria-current="${S.view==='home'}">
+      <span class="tile-name">Data</span><span class="tile-blurb">Choose or upload a customer list</span></button>
+    <button class="tile" data-go="personas" ${ready?"":"disabled"} aria-current="${S.view==='personas'}">
+      <span class="tile-name">Segments</span><span class="tile-blurb">${ready?`${S.ds.n_personas} personas found`:"Run segmentation first"}</span></button>`;
+  $("#rail").querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{
+    if(b.dataset.go==="home") renderHome(); else openPersonas();
+  });
+
+  $("#railareas").innerHTML = ready ? `<div class="eyebrow">Test a change</div>
+    <div class="rail-group">${S.areas.map(a=>`
+      <button class="tile" data-area="${a.id}" aria-current="${S.area===a.id}">
+        <span class="tile-name">${esc(a.name)}</span>
+        <span class="tile-blurb">${esc(a.blurb)}</span></button>`).join("")}</div>` : "";
+  $("#railareas").querySelectorAll("[data-area]").forEach(b=>b.onclick=()=>selectArea(b.dataset.area));
+
+  const h=S.health||{};
+  $("#railfoot").innerHTML = `
+    ${S.ds?`<div class="stat"><b>dataset</b><span>${esc((S.ds.name||"").slice(0,16))}</span></div>
+      <div class="stat"><b>customers</b><span>${(S.ds.rows||0).toLocaleString()}</span></div>`:""}
+    <div class="stat"><b><span class="dot ${h.api_key_present?"on":"off"}"></span>live model</b>
+      <span>${h.api_key_present?"ready":"no key"}</span></div>`;
+}
+
+const steps = (cur)=>{
+  const list=[["data","Data"],["map","Columns"],["k","Segments"],["review","Personas"],["test","Test"]];
+  const i=list.findIndex(s=>s[0]===cur);
+  return `<div class="steps">${list.map((s,j)=>
+    `<span class="step" data-on="${j===i}" data-done="${j<i}"><b>${j+1}</b> ${s[1]}</span>`).join("")}</div>`;
+};
+
+/* ================= 1. home ================= */
+function renderHome(){
+  S.view="home"; S.area=null; renderRail();
+  $("#main").innerHTML = steps("data") + `
+    <div class="hero">
+      <h2>Find out who leaves <em>before</em> you launch.</h2>
+      <p class="lede">Upload a customer list. LaunchGuard finds the segments hiding in it,
+      turns each one into a buyer persona, then runs your proposed change past them —
+      so you see who you would have kept anyway, and who you are about to pay for twice.</p>
+    </div>
+    <div class="section">
+      <div class="section-head"><h3>Start with a file</h3><span class="note">csv, one row per customer</span></div>
+      <div class="drop" id="drop">
+        <h4>Drop a CSV here</h4>
+        <p>or click to choose — we will work out which columns are which</p>
+        <input type="file" id="fileinput" accept=".csv,.tsv" hidden>
+      </div>
+      <div id="upmsg"></div>
+    </div>
+    ${S.samples.length?`<div class="section">
+      <div class="section-head"><h3>Or use a sample</h3><span class="note">known-good, loads instantly</span></div>
+      <div class="grid three">${S.samples.map((s,i)=>`
+        <div class="card pick" data-sample="${esc(s.filename)}" style="animation-delay:${i*60}ms">
+          <h4>${esc(s.name)}</h4>
+          <p class="sub">${s.rows?`${s.rows.toLocaleString()} customers`:"customer list"}</p>
+        </div>`).join("")}</div></div>`:""}
+    ${S.datasets.length?`<div class="section">
+      <div class="section-head"><h3>Earlier runs</h3><span class="note">${S.datasets.length} saved</span></div>
+      <div class="grid three">${S.datasets.map(d=>`
+        <div class="card pick" data-ds="${d.dataset_id}">
+          <h4>${esc(d.name||d.dataset_id)}</h4>
+          <p class="sub">${(d.rows||0).toLocaleString()} customers</p>
+          <div class="chips"><span class="chip ${d.status==='ready'?'mint':''}">${esc(d.status||"")}</span>
+          ${d.k?`<span class="chip">k=${d.k}</span>`:""}
+          ${d.silhouette?`<span class="chip">sil ${d.silhouette}</span>`:""}</div>
+        </div>`).join("")}</div></div>`:""}`;
+
+  const drop=$("#drop"), input=$("#fileinput");
+  drop.onclick=()=>input.click();
+  drop.ondragover=e=>{e.preventDefault();drop.classList.add("over")};
+  drop.ondragleave=()=>drop.classList.remove("over");
+  drop.ondrop=e=>{e.preventDefault();drop.classList.remove("over");
+    if(e.dataTransfer.files[0]) upload(e.dataTransfer.files[0]);};
+  input.onchange=()=>input.files[0]&&upload(input.files[0]);
+
+  document.querySelectorAll("[data-sample]").forEach(c=>c.onclick=()=>useSample(c.dataset.sample));
+  document.querySelectorAll("[data-ds]").forEach(c=>c.onclick=()=>openDataset(c.dataset.ds));
+}
+
+async function upload(file){
+  $("#upmsg").innerHTML = `<div class="msg" style="margin-top:12px"><div class="working">
+    <span class="pulse"></span>Reading ${esc(file.name)}…</div></div>`;
+  const fd = new FormData(); fd.append("file", file);
+  try{
+    const r = await fetch(API+"/api/datasets/upload", {method:"POST", body:fd});
+    const txt = await r.text();
+    let d; try{ d = JSON.parse(txt); }catch{ throw new Error(txt.slice(0,200)); }
+    if(!r.ok) throw new Error(d.detail||"upload failed");
+    S.ds=d; S.mapping={...d.mapping}; S.validation=d.validation;
+    renderMapping(d.preview);
+  }catch(e){
+    $("#upmsg").innerHTML = `<div class="msg bad" style="margin-top:12px">
+      <b>Could not read that file.</b><br>${esc(e.message)}</div>`;
+  }
+}
+
+async function useSample(fn){
+  try{
+    const d = await api(`/api/datasets/from-sample/${encodeURIComponent(fn)}`,{method:"POST"});
+    S.ds=d; S.mapping={...d.mapping}; S.validation=d.validation;
+    renderMapping(d.preview);
+  }catch(e){ alert(e.message); }
+}
+
+async function openDataset(id){
+  const d = await api(`/api/datasets/${id}`);
+  S.ds=d; S.mapping={...(d.mapping||{})};
+  renderRail();
+  if(d.status==="ready") openPersonas();
+  else renderMapping(d.preview);
+}
+
+/* ================= 2. mapping ================= */
+function renderMapping(preview){
+  S.view="mapping"; renderRail();
+  const cols = S.ds.columns||[];
+  const rows = S.fields.map(f=>{
+    const cur = S.mapping[f.field]||"";
+    const c = (S.ds.confidence||{})[f.field]||0;
+    const cls = c>=0.85?"hi":c>=0.6?"mid":"lo";
+    return `<div class="maprow">
+      <div><div class="mapname">${esc(f.field)}${f.required?' <span style="color:var(--amber)">*</span>':''}</div>
+        <div class="mapdesc">${esc(f.description)}</div></div>
+      <select data-field="${esc(f.field)}">
+        <option value="">— not in my file —</option>
+        ${cols.map(c2=>`<option value="${esc(c2)}" ${c2===cur?"selected":""}>${esc(c2)}</option>`).join("")}
+      </select>
+      <div class="conf ${cls}">${c?Math.round(c*100)+"%":"—"}</div>
+    </div>`;}).join("");
+
+  $("#main").innerHTML = steps("map") + `
+    <div class="hero"><h2>Check the columns.</h2>
+      <p class="lede">We matched your headers to what the model needs. Confidence is on the
+      right — anything under 60% is worth a look. Fix anything wrong before continuing,
+      because a wrong column here produces confident nonsense later.</p></div>
+    <div class="section">
+      <div class="section-head"><h3>${esc(S.ds.name)}</h3>
+        <span class="note">${(S.ds.rows||0).toLocaleString()} rows · ${cols.length} columns</span></div>
+      <div id="valid"></div>
+      <div class="card" style="margin-top:13px">${rows}</div>
+      <div class="controls" style="margin-top:16px">
+        <button class="run" id="next">Continue</button>
+        <button class="ghost" id="back">Choose another file</button>
+      </div>
+    </div>
+    ${preview?`<div class="section"><div class="section-head"><h3>First rows</h3>
+      <span class="note">as read from the file</span></div>
+      <div style="overflow-x:auto"><table><thead><tr>${cols.slice(0,9).map(c=>`<th>${esc(c)}</th>`).join("")}</tr></thead>
+      <tbody>${preview.slice(0,4).map(r=>`<tr>${cols.slice(0,9).map(c=>`<td>${esc(r[c])}</td>`).join("")}</tr>`).join("")}</tbody></table></div></div>`:""}`;
+
+  document.querySelectorAll("[data-field]").forEach(sel=>sel.onchange=()=>{
+    S.mapping[sel.dataset.field]=sel.value||null; validate();
+  });
+  $("#next").onclick=goToK;
+  $("#back").onclick=renderHome;
+  showValidation(S.validation);
+}
+
+async function validate(){
+  try{
+    const r = await api(`/api/datasets/${S.ds.dataset_id}/mapping`,
+      {method:"POST", body:JSON.stringify({mapping:S.mapping})});
+    S.validation=r.validation; showValidation(r.validation);
+  }catch(e){ /* keep last state */ }
+}
+
+function showValidation(v){
+  if(!v){ $("#valid").innerHTML=""; return; }
+  const el=$("#valid"); if(!el) return;
+  if(v.ok && !v.warnings.length){
+    el.innerHTML = `<div class="msg"><b>Looks good.</b> ${v.cluster_fields_mapped.length}
+      behavioural columns mapped — enough to find real segments.</div>`;
+  } else {
+    el.innerHTML =
+      (v.errors.length?`<div class="msg bad"><b>Fix these first:</b><ul>${
+        v.errors.map(e=>`<li>${esc(e)}</li>`).join("")}</ul></div>`:"") +
+      (v.warnings.length?`<div class="msg warn" style="margin-top:9px"><b>Worth knowing:</b><ul>${
+        v.warnings.map(w=>`<li>${esc(w)}</li>`).join("")}</ul></div>`:"");
+  }
+  const n=$("#next"); if(n) n.disabled = !v.ok;
+}
+
+/* ================= 3. choose k ================= */
+async function goToK(){
+  await validate();
+  if(S.validation && !S.validation.ok) return;
+  S.view="k"; renderRail();
+  $("#main").innerHTML = steps("k") + `
+    <div class="hero"><h2>How many segments?</h2>
+      <p class="lede">Fewer segments are easier to act on; more are more precise.
+      We score each option so you are not guessing.</p></div>
+    <div class="section"><div class="msg"><div class="working">
+      <span class="pulse"></span>Scoring each option…</div></div></div>`;
+  try{
+    S.kscores = await api(`/api/datasets/${S.ds.dataset_id}/suggest-k`);
+    S.k = S.kscores.recommended_k || 3;
+    renderKPicker();
+  }catch(e){
+    $("#main").innerHTML = steps("k") + `<div class="msg bad"><b>Could not score.</b><br>${esc(e.message)}</div>`;
+  }
+}
+
+function renderKPicker(){
+  const sc = S.kscores.scores||[];
+  const best = Math.max(...sc.map(s=>s.silhouette), 0.001);
+  const base = S.kscores.random_baseline||0.17;
+  $("#main").innerHTML = steps("k") + `
+    <div class="hero"><h2>How many segments?</h2>
+      <p class="lede">Fewer segments are easier to act on; more are more precise.
+      A score near ${base} is what random data gets, so higher means the segments are real.</p></div>
+    <div class="section">
+      <div class="section-head"><h3>Pick a number</h3>
+        <span class="note">clustering on ${(S.kscores.features_used||[]).length} behavioural columns</span></div>
+      <div class="kpick" id="kpick">${sc.map(s=>`
+        <button class="kbtn" data-k="${s.k}" aria-pressed="${s.k===S.k}">
+          ${s.k}<small>${s.silhouette.toFixed(2)}</small></button>`).join("")}</div>
+      <div class="card" style="margin-top:14px">
+        <div class="bars">${sc.map(s=>`
+          <div class="bar-row"><span class="bar-label">k = ${s.k}</span>
+          <span class="bar-track"><span class="bar-fill" style="width:${s.silhouette/best*100}%;background:${s.silhouette>base?"var(--mint)":"var(--dim)"}"></span></span>
+          <span class="bar-val">${s.silhouette.toFixed(3)}</span></div>`).join("")}</div>
+        <p class="ledger-note">Highest score is k=${S.kscores.recommended_k}.
+        ${sc.every(s=>s.silhouette<base)?`<b>Every option scores below the ${base} random baseline</b> —
+        this data may not contain clearly separated groups. You can continue, but say so honestly.`:
+        `Anything above ${base} is real structure rather than an arbitrary split.`}</p>
+      </div>
+      <div class="controls" style="margin-top:16px">
+        <button class="run" id="go">Build ${S.k} personas</button>
+        <button class="ghost" id="back">Back to columns</button>
+      </div>
+      <div class="msg" style="margin-top:4px">This takes about a minute: clustering runs
+      locally, then one model call writes each persona.</div>
+    </div>`;
+  document.querySelectorAll("[data-k]").forEach(b=>b.onclick=()=>{
+    S.k=+b.dataset.k; renderKPicker();
+  });
+  $("#go").onclick=runPipeline;
+  $("#back").onclick=()=>renderMapping(null);
+}
+
+/* ================= 4. run ================= */
+async function runPipeline(){
+  S.view="running"; renderRail();
+  $("#main").innerHTML = steps("review") + `
+    <div class="hero"><h2>Building your segments.</h2></div>
+    <div class="section"><div class="card">
+      <div class="working"><span class="pulse"></span><span id="stage">Starting…</span></div>
+      <div class="progress"><span id="pbar" style="width:2%"></span></div>
+      <p class="sub" id="pctxt">0%</p>
+    </div></div>`;
+  try{
+    const {job_id} = await api(`/api/datasets/${S.ds.dataset_id}/run`,
+      {method:"POST", body:JSON.stringify({k:S.k, generate_personas:true})});
+    poll(job_id);
+  }catch(e){
+    $("#main").innerHTML = steps("review")+`<div class="msg bad"><b>Could not start.</b><br>${esc(e.message)}</div>`;
+  }
+}
+
+async function poll(jid){
+  try{
+    const j = await api(`/api/jobs/${jid}`);
+    const bar=$("#pbar"), st=$("#stage"), tx=$("#pctxt");
+    if(bar){ bar.style.width=Math.max(j.percent,2)+"%"; st.textContent=j.stage; tx.textContent=j.percent+"%"; }
+    if(j.status==="done"){
+      S.ds = await api(`/api/datasets/${S.ds.dataset_id}`);
+      S.datasets = (await api("/api/datasets")).datasets;
+      openPersonas(); return;
+    }
+    if(j.status==="failed"){
+      $("#main").innerHTML = steps("review")+`<div class="msg bad">
+        <b>Segmentation failed.</b><br>${esc(j.error||"")}</div>
+        <div class="controls" style="margin-top:14px"><button class="ghost" id="b">Start over</button></div>`;
+      $("#b").onclick=renderHome; return;
+    }
+    setTimeout(()=>poll(jid), 1200);
+  }catch(e){ setTimeout(()=>poll(jid), 2000); }
+}
+
+/* ================= 5. personas ================= */
+async function openPersonas(){
+  S.view="personas"; S.area=null; renderRail();
+  $("#main").innerHTML = steps("review")+`<div class="msg"><div class="working">
+    <span class="pulse"></span>Loading personas…</div></div>`;
+  try{
+    S.personas = await api(`/api/datasets/${S.ds.dataset_id}/personas`);
+    renderPersonas();
+  }catch(e){
+    $("#main").innerHTML = `<div class="msg bad">${esc(e.message)}</div>`;
+  }
+}
+
+function renderPersonas(){
+  const m=S.personas.meta||{}, ps=S.personas.personas||[];
+  const gr = m.mean_grounding_rate;
+  $("#main").innerHTML = steps("review") + `
+    <div class="hero"><h2>${ps.length} buyer personas.</h2>
+      <p class="lede">Built from behaviour only — spend, recency and browsing.
+      Everything each persona claims is traceable back to the numbers it was shown.</p></div>
+    <div class="section">
+      <div class="section-head"><h3>Your customer base</h3>
+        <span class="note">k=${m.k} · silhouette ${m.silhouette} · ${(m.total_users||0).toLocaleString()} customers</span></div>
+      ${gr!=null?`<div class="msg" style="margin-bottom:13px"><b>${Math.round(gr*100)}% of persona claims
+        trace directly to the input statistics.</b> The rest are flagged in the audit below.</div>`:""}
+      <div class="grid three">${ps.map((p,i)=>`
+        <div class="card" style="animation-delay:${i*70}ms">
+          <h4>${esc(p.persona_name)}</h4>
+          <p class="sub">${esc(p.one_line_summary||"")}</p>
+          <div class="chips">
+            <span class="chip">${p.pct_of_customers??p.segment_share_percentage}% of customers</span>
+            ${p.pct_of_revenue!=null?`<span class="chip mint">${p.pct_of_revenue}% of revenue</span>`:""}
+          </div>
+          <div class="bars">
+            ${bar("price sens.",p.price_sensitivity_score,"var(--amber)")}
+            ${bar("loyalty",p.brand_loyalty_score,"var(--mint)")}
+            ${bar("deliberation",p.deliberation_score,"var(--muted)")}
+          </div>
+          <p class="sub" style="margin-top:13px"><b style="color:var(--bone)">Do this:</b>
+            ${esc(p.merchant_recommendation||"")}</p>
+        </div>`).join("")}</div>
+      <div class="controls" style="margin-top:18px">
+        <button class="run" id="test">Test a change against these</button>
+        <button class="ghost" id="dl">Download the tagged customer list</button>
+      </div>
+    </div>`;
+  $("#test").onclick=()=>selectArea(S.areas[1]?.id||S.areas[0]?.id);
+  $("#dl").onclick=()=>window.open(
+    `/api/datasets/${S.ds.dataset_id}/file/users_with_personas.csv`,"_blank");
+}
+
+const bar=(l,v,c)=>`<div class="bar-row"><span class="bar-label">${l}</span>
+  <span class="bar-track"><span class="bar-fill" style="width:${(v||0)*100}%;background:${c}"></span></span>
+  <span class="bar-val">${(v??0).toFixed(2)}</span></div>`;
+
+/* ================= 6. simulate ================= */
+function selectArea(id){
+  const a=S.areas.find(x=>x.id===id); if(!a) return;
+  S.view="test"; S.area=id; S.preset=0; renderRail();
+  a.engine==="intervention"?renderIntervention(a):renderAB(a);
+}
+
+function renderIntervention(a){
+  $("#main").innerHTML = steps("test") + `
+    <div class="hero"><h2>${esc(a.name)}</h2><p class="lede">${esc(a.blurb)}</p></div>
+    <div class="section">
+      <div class="section-head"><h3>Choose a change</h3><span class="note">costed per segment</span></div>
+      <div class="controls" id="presets">${a.presets.map((p,i)=>
+        `<button class="preset" data-i="${i}" aria-pressed="${i===0}">${esc(p.label)}</button>`).join("")}</div>
+      <div class="controls">
+        <button class="run" id="go">Run simulation</button>
+        <button class="ghost" id="live">Run live</button>
+      </div>
+      <div id="out"></div>
+    </div>`;
+  $("#presets").querySelectorAll(".preset").forEach(b=>b.onclick=()=>{
+    S.preset=+b.dataset.i;
+    $("#presets").querySelectorAll(".preset").forEach(x=>x.setAttribute("aria-pressed",x===b));
+  });
+  $("#go").onclick=()=>runInterv(a,false);
+  $("#live").onclick=()=>runInterv(a,true);
+}
+
+async function runInterv(a,live){
+  if(S.busy)return; S.busy=true;
+  const p=a.presets[S.preset||0];
+  $("#out").innerHTML=`<div class="msg"><div class="working"><span class="pulse"></span>
+    ${live?"Asking each persona…":"Loading…"}</div></div>`;
+  try{
+    const r=await api(`/api/datasets/${S.ds.dataset_id}/simulate/intervention`,
+      {method:"POST",body:JSON.stringify({kind:p.kind,magnitude:p.magnitude,label:p.label,force_live:live})});
+    showInterv(r);
+  }catch(e){ $("#out").innerHTML=`<div class="msg bad"><b>Failed.</b><br>${esc(e.message)}</div>`; }
+  S.busy=false;
+}
+
+function showInterv(r){
+  const t=r.totals,c=r.comparison||{},sv=c.savings||{};
+  const net=t.net_profit_impact||0;
+  const dp=(r.segments||[]).find(s=>s.affected)?.effective_price_delta ?? 0;
+  let outL,inL,out_,in_;
+  if(dp<0){
+    outL="discount paid out"; inL="margin earned";
+    out_=t.wasted_margin||0; in_=Math.max(t.incremental_margin||0,0);
+  }else{
+    outL="revenue lost to churn"; inL="revenue from higher price";
+    out_=(r.segments||[]).reduce((a,s)=>a+(s.affected?Math.max(-(s.volume_change_pct||0),0)*(s.baseline_revenue||0):0),0);
+    in_=(r.segments||[]).reduce((a,s)=>a+(s.affected?(s.baseline_revenue||0)*(1+(s.volume_change_pct||0))*(s.effective_price_delta||0):0),0);
+  }
+  const span=Math.max(out_,in_,1);
+
+  const voices=(r.reactions||[]).map(x=>`<div class="card"><h4>${esc(x.persona_name)}</h4>
+    <div class="chips"><span class="chip ${x.reaction.purchase_intent_change>=0?"mint":"amber"}">${esc(x.reaction.verdict)}</span>
+    <span class="chip">intent ${pct(x.reaction.purchase_intent_change*100)}</span></div>
+    <blockquote class="quote">“${esc(x.reaction.quotable_line)}”
+      <cite>${esc(x.reaction.main_objection||"")}</cite></blockquote>
+    ${((x.reconciliation||{}).issues||[]).map(i=>`<div class="flag">${esc(i)}</div>`).join("")}</div>`).join("");
+
+  const rk=r.ranking_check||{};
+  $("#out").innerHTML=`
+    <div class="ledger">
+      <div class="ledger-head"><h3>${esc(r.intervention.label)}</h3>
+        <span class="verdict ${net>=0?"pos":"neg"}">net ${money(net)}</span></div>
+      <div class="scale">
+        <span class="scale-cap l">${outL}</span><span class="scale-cap r">${inL}</span>
+        <span class="scale-track">
+          <span class="scale-out" style="width:${out_/span*50}%"></span>
+          <span class="scale-in" style="width:${in_/span*50}%"></span></span>
+        <span class="scale-mid"></span>
+        <span class="scale-fig l">${money(out_)}</span>
+        <span class="scale-fig r">${money(in_)}</span>
+      </div>
+      ${sv.margin_saved?`<p class="ledger-note">Aim it at ${(c.recommended_clusters||[]).length}
+        segment(s) instead of everyone and you keep <b>${money(sv.margin_saved)}</b> —
+        ${sv.margin_saved_pct}% less waste, sparing <b>${(sv.customers_spared||0).toLocaleString()}</b>
+        customers a discount they did not need.</p>`:""}
+    </div>
+    <div class="section-head" style="margin-top:24px"><h3>By segment</h3>
+      <span class="note">${r._cached?"from cache":"live run"}</span></div>
+    <table><thead><tr><th>Persona</th><th class="num">Customers</th><th class="num">Volume</th>
+      <th class="num">Revenue Δ</th><th class="num">Net</th></tr></thead>
+      <tbody>${(r.segments||[]).map(s=>`<tr>
+        <td>${esc(nameFor(s.cluster_id))}</td>
+        <td class="num">${(s.n_customers||0).toLocaleString()}</td>
+        <td class="num">${s.affected?pct(s.volume_change_pct*100):"—"}</td>
+        <td class="num ${(s.revenue_delta||0)>=0?"pos":"neg"}">${money(s.revenue_delta||0)}</td>
+        <td class="num ${(s.net_profit_impact||0)>=0?"pos":"neg"}">${money(s.net_profit_impact||0)}</td>
+      </tr>`).join("")}</tbody></table>
+    ${voices?`<div class="section-head" style="margin-top:28px"><h3>What they said</h3>
+      <span class="note">one call per persona</span></div><div class="grid three">${voices}</div>`:""}
+    ${rk.checked?`<div class="section"><div class="msg">The personas never saw the elasticity
+      figures. Their ranking agreed with the maths on <b>${Math.round(rk.agreement*100)}%</b>
+      of pairs${rk.exact_match?" — an exact match":""}.</div></div>`:""}`;
+}
+
+const nameFor=cid=>((S.personas?.personas||[]).find(p=>p.cluster_id===cid)||{}).persona_name||`Cluster ${cid}`;
+
+function renderAB(a){
+  const p=a.presets[0]||{};
+  $("#main").innerHTML = steps("test") + `
+    <div class="hero"><h2>${esc(a.name)}</h2><p class="lede">${esc(a.blurb)}</p></div>
+    <div class="section">
+      <div class="section-head"><h3>Describe both versions</h3>
+        <span class="note">plain english, as a shopper would see it</span></div>
+      <div class="grid two">
+        <div class="field"><label>Variant A — control</label><textarea id="va">${esc(p.variant_a||"")}</textarea></div>
+        <div class="field"><label>Variant B — treatment</label><textarea id="vb">${esc(p.variant_b||"")}</textarea></div>
+      </div>
+      <div class="controls">
+        <button class="run" id="go">Run A/B test</button>
+        <button class="ghost" id="aa">Measure noise floor (A/A)</button>
+      </div>
+      <div id="out"></div>
+    </div>`;
+  $("#go").onclick=()=>runAB(false);
+  $("#aa").onclick=()=>runAB(true);
+}
+
+async function runAB(aa){
+  if(S.busy)return; S.busy=true;
+  $("#out").innerHTML=`<div class="msg"><div class="working"><span class="pulse"></span>
+    ${aa?"Running both arms identical…":"Simulating shoppers…"}</div></div>`;
+  try{
+    const r=await api(`/api/datasets/${S.ds.dataset_id}/simulate/abtest`,{method:"POST",
+      body:JSON.stringify({variant_a:$("#va").value,variant_b:$("#vb").value,
+                           aa_test:aa, force_live:aa})});
+    showAB(r,aa);
+  }catch(e){ $("#out").innerHTML=`<div class="msg bad"><b>Failed.</b><br>${esc(e.message)}</div>`; }
+  S.busy=false;
+}
+
+function showAB(r,aa){
+  if(r.error){ $("#out").innerHTML=`<div class="msg bad">${esc(r.error)}</div>`; return; }
+  const s=r.overall_summary||{}, lift=s.rpu_relative_lift_pct||0;
+  const floor = aa
+    ? `<div class="msg"><b>Noise floor: ${Math.abs(lift).toFixed(1)}%.</b> Both arms were identical,
+       so this is how much lift the model reports from nothing. Treat anything below it as no result.</div>`
+    : (r.noise_floor?`<div class="msg">Measured noise floor is
+       <b>${Math.abs(r.noise_floor.rpu_relative_lift_pct||0).toFixed(1)}%</b>. This result is
+       <b>${r.above_noise_floor?"above":"below"}</b> it${r.above_noise_floor?"":" — not distinguishable from noise"}.</div>`
+      :`<div class="msg warn">No noise floor measured yet. Run the A/A test before trusting this.</div>`);
+
+  const seen=new Set();
+  const voices=(r.raw_results||[]).filter(x=>x.quote&&!seen.has(x.persona)&&seen.add(x.persona))
+    .map(x=>`<div class="card"><h4>${esc(x.persona)}</h4>
+      <blockquote class="quote">“${esc(x.quote)}”<cite>${esc(x.reason||"")}</cite></blockquote></div>`).join("");
+
+  $("#out").innerHTML=`
+    <div class="ledger">
+      <div class="ledger-head"><h3>${aa?"A/A noise check":"Revenue per user"}</h3>
+        <span class="verdict ${lift>=0?"pos":"neg"}">${pct(lift)}</span></div>
+      <p class="ledger-note" style="border-top:none;margin-top:0;padding-top:0">
+        ${s.simulated_users} shoppers simulated${s.failed_users?`, ${s.failed_users} failed`:""}.
+        Control ${s.control_cvr}% → treatment ${s.treatment_cvr}% conversion.
+        Spread ±${s.lift_std_dev_pct}pp.</p>
+    </div>
+    ${floor}
+    <div class="section-head" style="margin-top:24px"><h3>By persona</h3>
+      <span class="note">${r._cached?"from cache":"live run"}</span></div>
+    <table><thead><tr><th>Persona</th><th class="num">n</th><th class="num">CVR</th>
+      <th class="num">AOV</th><th class="num">RPU</th></tr></thead>
+      <tbody>${(r.persona_breakdown||[]).map(p=>`<tr><td>${esc(p.persona)}</td>
+        <td class="num">${p.n}</td>
+        <td class="num ${p.cvr_lift_pct>=0?"pos":"neg"}">${pct(p.cvr_lift_pct||0)}</td>
+        <td class="num ${p.aov_lift_pct>=0?"pos":"neg"}">${pct(p.aov_lift_pct||0)}</td>
+        <td class="num ${p.rpu_lift_pct>=0?"pos":"neg"}">${pct(p.rpu_lift_pct||0)}</td></tr>`).join("")}</tbody></table>
+    ${voices?`<div class="section-head" style="margin-top:28px"><h3>What they said</h3>
+      <span class="note">variant B</span></div><div class="grid three">${voices}</div>`:""}`;
+}
+
+boot();
+</script>
+</body>
+</html>
