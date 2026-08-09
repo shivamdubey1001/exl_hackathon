@@ -210,7 +210,10 @@ a real barrier for this specific shopper.
 react to a discount banner. One at 0.75 should react strongly.
 4. It is a valid and common answer that a variant changes nothing for this \
 shopper. Do not invent a lift to seem useful.
-5. Return ONE JSON object, no markdown fences, no commentary."""
+5. Return ONE JSON object, no markdown fences, no commentary.
+6. Inside JSON string values, never use double quotes and avoid apostrophes \
+where you can. Refer to variants as "variant A" and "variant B" rather than \
+quoting their text back."""
 
 
 RESPONSE_FIELDS = {
@@ -244,10 +247,18 @@ def extract_json(text: str) -> dict:
     try:
         return json.loads(t)
     except json.JSONDecodeError:
-        m = re.search(r"\{.*\}", t, re.DOTALL)
-        if not m:
-            raise
-        return json.loads(m.group(0))
+        pass
+    m = re.search(r"\{.*\}", t, re.DOTALL)
+    if not m:
+        raise json.JSONDecodeError("no JSON object found", t, 0)
+    blob = m.group(0)
+    try:
+        return json.loads(blob)
+    except json.JSONDecodeError:
+        # Models often echo quoted variant text into a string value, which
+        # breaks the JSON. Escape stray double quotes that sit mid-value.
+        fixed = re.sub(r'(?<=[\w\s)\-%$.])"(?=[\w\s(\-%$.])', "'", blob)
+        return json.loads(fixed)
 
 
 def evaluate_user(sample: dict, variant_a: str, variant_b: str,
@@ -296,6 +307,17 @@ def evaluate_user(sample: dict, variant_a: str, variant_b: str,
             print(f"[ab] user {sample['user_id']} attempt {attempt+1} failed: "
                   f"{type(e).__name__}: {e}")
             time.sleep(2 ** attempt)
+
+    # All three attempts failed. Return an explicit failure row rather than
+    # falling off the end and returning None, which crashes the aggregation.
+    return {
+        "user_id": sample["user_id"],
+        "persona": sample["persona"],
+        "cvr_a": np.nan, "cvr_b": np.nan,
+        "aov_a": np.nan, "aov_b": np.nan,
+        "reason": f"ERROR: {last_err}", "quote": "",
+        "failed": True,
+    }
 
 
 # =============================================================================

@@ -249,7 +249,9 @@ class AnalystEngine:
         required = ["cluster_id", "monetary_net", "price_elasticity"]
         missing = [c for c in required if c not in self.df.columns]
         if missing:
-            raise SystemExit(f"users_clustered.csv missing columns: {missing}")
+            raise ValueError(
+                f"This dataset is missing {missing}, which pricing needs. "
+                f"Map those columns, or use the A/B test instead.")
 
         self.total = len(self.df)
         self.total_revenue = float(self.df["monetary_net"].sum())
