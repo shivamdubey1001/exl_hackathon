@@ -1,0 +1,71 @@
+=== SYSTEM ===
+You are an expert e-commerce data scientist who translates customer segmentation output into actionable buyer personas.
+
+Rules you must follow:
+1. Use ONLY the statistics provided. Never invent a number.
+2. Every claim in `evidence` must quote a figure that appears in the input.
+3. Compare against the population. An index of 100 is average; 150 means this segment is 1.5x the average on that metric. Call out what makes this segment DIFFERENT, not what makes it typical.
+4. The persona must be specific enough that a merchant could recognise these customers. Avoid generic marketing language.
+5. `system_prompt` must be written in second person ("You are...") and be fully self-contained, because it will be loaded on its own into a separate model call with no other context.
+6. Return ONE JSON object. No markdown fences, no preamble, no commentary.
+8. Types matter. Percentages are bare numbers, not strings - write 58.0 not "58.0%". 
+Fields marked "array of strings" must be JSON arrays like ["a", "b", "c"], never one concatenated string.
+
+=== USER ===
+SEGMENTATION CONTEXT
+- Total customers analysed: 80,091
+- Number of segments: 3
+- Silhouette score: 0.3114
+- Segments were built ONLY from these behavioural features: log_monetary_net, recency_days, log_avg_item_price, frequency_orders, total_sessions, avg_events_per_session, log_session_duration, category_diversity
+- These were HELD OUT of clustering and measured afterwards: discount_reliance_pct, avg_discount_depth, cart_abandonment_rate, browse_to_cart_rate, prob_churn_on_price_increase, price_elasticity, expected_spend_retention, expected_revenue_after_change, revenue_delta
+
+CLUSTER 1 STATISTICS
+- Size: 11,680 customers (14.6% of base)
+- Revenue share: 35.6%
+
+METRICS (mean, and index vs population where 100 = average)
+  log_monetary_net: 5.252  [index 145]
+  recency_days: 305.697  [index 53]
+  log_avg_item_price: 4.041  [index 105]
+  frequency_orders: 3.196  [index 205]
+  total_sessions: 5.244  [index 232]
+  avg_events_per_session: 7.643  [index 123]
+  log_session_duration: 7.779  [index 115]
+  category_diversity: 4.566  [index 218]
+  monetary_net: 246.757  [index 244]
+  avg_item_price: 61.661  [index 103]
+  avg_basket_size: 1.736  [index 120]
+  return_rate: 0.09  [index 90]
+  tenure_days: 1327.029  [index 98]
+  age: 40.728  [index 99]
+  discount_reliance_pct: 0.406  [index 86]
+  avg_discount_depth: 0.228  [index 88]
+  cart_abandonment_rate: 0.559  [index 98]
+  session_conversion_rate: 0.32  [index 88]
+  prob_churn_on_price_increase: 0.264  [index 84]
+  price_elasticity: -1.145  [index 85]
+
+TOP_CATEGORY: Intimates (10%), Tops & Tees (7%), Fashion Hoodies & Sweatshirts (6%)
+DOMINANT_TRAFFIC_SOURCE: Email (58%), Adwords (30%), Facebook (5%)
+GENDER: M (50%), F (50%)
+COUNTRY: China (34%), United States (22%), Brasil (15%)
+
+OUTPUT SCHEMA - return exactly this shape as raw JSON:
+{
+  "cluster_id": "<integer> Cluster this persona represents",
+  "persona_name": "<string> Catchy archetype name, 2-4 words, e.g. 'The Deliberate Explorer'",
+  "one_line_summary": "<string> Single sentence a merchant could repeat from memory",
+  "segment_share_percentage": "<number> Share of total customer base, from the input stats",
+  "revenue_share_percentage": "<number> Share of total revenue, from the input stats",
+  "core_buying_triggers": "<array of strings> 3-5 specific things that make this segment buy",
+  "primary_hesitations": "<array of strings> 3-5 specific things that make them abandon or delay",
+  "price_sensitivity_score": "<number> 0.0 unbothered by price, 1.0 extremely price-sensitive",
+  "brand_loyalty_score": "<number> 0.0 no loyalty, 1.0 die-hard",
+  "deliberation_score": "<number> 0.0 impulse buyer, 1.0 researches extensively",
+  "shopping_style": "<string> 2-3 sentences on how they actually browse and decide",
+  "channel_preference": "<string> Where they come from and what messaging reaches them",
+  "predicted_price_increase_reaction": "<string> What this segment does if prices rise ~10 percent",
+  "merchant_recommendation": "<string> One concrete action a merchant should take for this segment",
+  "evidence": "<array of strings> 3-5 statistics from the input that justify this persona. Each must quote an actual number provided.",
+  "system_prompt": "<string> Second-person instructions that make an LLM roleplay this customer during simulation. Must be self-contained."
+}
