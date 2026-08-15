@@ -1,0 +1,349 @@
+{
+  "k": 3,
+  "silhouette": 0.3114,
+  "clustered_on": [
+    "log_monetary_net",
+    "recency_days",
+    "log_avg_item_price",
+    "frequency_orders",
+    "total_sessions",
+    "avg_events_per_session",
+    "log_session_duration",
+    "category_diversity"
+  ],
+  "held_out": [
+    "discount_reliance_pct",
+    "avg_discount_depth",
+    "cart_abandonment_rate",
+    "browse_to_cart_rate",
+    "prob_churn_on_price_increase",
+    "price_elasticity",
+    "expected_spend_retention",
+    "expected_revenue_after_change",
+    "revenue_delta"
+  ],
+  "total_users": 80091,
+  "clusters": [
+    {
+      "cluster_id": 2,
+      "size": 46474,
+      "share_of_customers_pct": 58.0,
+      "share_of_revenue_pct": 31.9,
+      "metrics": {
+        "log_monetary_net": {
+          "mean": 3.088,
+          "vs_population_index": 86
+        },
+        "recency_days": {
+          "mean": 626.073,
+          "vs_population_index": 109
+        },
+        "log_avg_item_price": {
+          "mean": 3.782,
+          "vs_population_index": 98
+        },
+        "frequency_orders": {
+          "mean": 1.255,
+          "vs_population_index": 80
+        },
+        "total_sessions": {
+          "mean": 1.264,
+          "vs_population_index": 56
+        },
+        "avg_events_per_session": {
+          "mean": 5.018,
+          "vs_population_index": 81
+        },
+        "log_session_duration": {
+          "mean": 5.846,
+          "vs_population_index": 86
+        },
+        "category_diversity": {
+          "mean": 1.242,
+          "vs_population_index": 59
+        },
+        "monetary_net": {
+          "mean": 55.611,
+          "vs_population_index": 55
+        },
+        "avg_item_price": {
+          "mean": 59.489,
+          "vs_population_index": 100
+        },
+        "avg_basket_size": {
+          "mean": 1.008,
+          "vs_population_index": 70
+        },
+        "return_rate": {
+          "mean": 0.101,
+          "vs_population_index": 101
+        },
+        "tenure_days": {
+          "mean": 1362.607,
+          "vs_population_index": 100
+        },
+        "age": {
+          "mean": 41.025,
+          "vs_population_index": 100
+        },
+        "discount_reliance_pct": {
+          "mean": 0.498,
+          "vs_population_index": 106
+        },
+        "avg_discount_depth": {
+          "mean": 0.272,
+          "vs_population_index": 105
+        },
+        "cart_abandonment_rate": {
+          "mean": 0.569,
+          "vs_population_index": 100
+        },
+        "session_conversion_rate": {
+          "mean": 0.4,
+          "vs_population_index": 110
+        },
+        "prob_churn_on_price_increase": {
+          "mean": 0.328,
+          "vs_population_index": 105
+        },
+        "price_elasticity": {
+          "mean": -1.438,
+          "vs_population_index": 106
+        }
+      },
+      "top_top_category": {
+        "Intimates": 0.075,
+        "Jeans": 0.069,
+        "Fashion Hoodies & Sweatshirts": 0.065
+      },
+      "top_dominant_traffic_source": {
+        "Email": 0.448,
+        "Adwords": 0.302,
+        "Facebook": 0.1
+      },
+      "top_gender": {
+        "F": 0.501,
+        "M": 0.499
+      },
+      "top_country": {
+        "China": 0.343,
+        "United States": 0.22,
+        "Brasil": 0.148
+      }
+    },
+    {
+      "cluster_id": 0,
+      "size": 21937,
+      "share_of_customers_pct": 27.4,
+      "share_of_revenue_pct": 32.4,
+      "metrics": {
+        "log_monetary_net": {
+          "mean": 3.84,
+          "vs_population_index": 106
+        },
+        "recency_days": {
+          "mean": 615.78,
+          "vs_population_index": 107
+        },
+        "log_avg_item_price": {
+          "mean": 3.927,
+          "vs_population_index": 102
+        },
+        "frequency_orders": {
+          "mean": 1.335,
+          "vs_population_index": 86
+        },
+        "total_sessions": {
+          "mean": 2.777,
+          "vs_population_index": 123
+        },
+        "avg_events_per_session": {
+          "mean": 8.001,
+          "vs_population_index": 129
+        },
+        "log_session_duration": {
+          "mean": 8.175,
+          "vs_population_index": 121
+        },
+        "category_diversity": {
+          "mean": 2.576,
+          "vs_population_index": 123
+        },
+        "monetary_net": {
+          "mean": 119.562,
+          "vs_population_index": 118
+        },
+        "avg_item_price": {
+          "mean": 59.008,
+          "vs_population_index": 99
+        },
+        "avg_basket_size": {
+          "mean": 2.225,
+          "vs_population_index": 154
+        },
+        "return_rate": {
+          "mean": 0.103,
+          "vs_population_index": 103
+        },
+        "tenure_days": {
+          "mean": 1369.082,
+          "vs_population_index": 101
+        },
+        "age": {
+          "mean": 41.076,
+          "vs_population_index": 100
+        },
+        "discount_reliance_pct": {
+          "mean": 0.449,
+          "vs_population_index": 95
+        },
+        "avg_discount_depth": {
+          "mean": 0.246,
+          "vs_population_index": 95
+        },
+        "cart_abandonment_rate": {
+          "mean": 0.585,
+          "vs_population_index": 102
+        },
+        "session_conversion_rate": {
+          "mean": 0.31,
+          "vs_population_index": 85
+        },
+        "prob_churn_on_price_increase": {
+          "mean": 0.31,
+          "vs_population_index": 99
+        },
+        "price_elasticity": {
+          "mean": -1.284,
+          "vs_population_index": 95
+        }
+      },
+      "top_top_category": {
+        "Intimates": 0.096,
+        "Tops & Tees": 0.076,
+        "Accessories": 0.071
+      },
+      "top_dominant_traffic_source": {
+        "Email": 0.494,
+        "Adwords": 0.303,
+        "YouTube": 0.083
+      },
+      "top_gender": {
+        "M": 0.501,
+        "F": 0.499
+      },
+      "top_country": {
+        "China": 0.343,
+        "United States": 0.22,
+        "Brasil": 0.147
+      }
+    },
+    {
+      "cluster_id": 1,
+      "size": 11680,
+      "share_of_customers_pct": 14.6,
+      "share_of_revenue_pct": 35.6,
+      "metrics": {
+        "log_monetary_net": {
+          "mean": 5.252,
+          "vs_population_index": 145
+        },
+        "recency_days": {
+          "mean": 305.697,
+          "vs_population_index": 53
+        },
+        "log_avg_item_price": {
+          "mean": 4.041,
+          "vs_population_index": 105
+        },
+        "frequency_orders": {
+          "mean": 3.196,
+          "vs_population_index": 205
+        },
+        "total_sessions": {
+          "mean": 5.244,
+          "vs_population_index": 232
+        },
+        "avg_events_per_session": {
+          "mean": 7.643,
+          "vs_population_index": 123
+        },
+        "log_session_duration": {
+          "mean": 7.779,
+          "vs_population_index": 115
+        },
+        "category_diversity": {
+          "mean": 4.566,
+          "vs_population_index": 218
+        },
+        "monetary_net": {
+          "mean": 246.757,
+          "vs_population_index": 244
+        },
+        "avg_item_price": {
+          "mean": 61.661,
+          "vs_population_index": 103
+        },
+        "avg_basket_size": {
+          "mean": 1.736,
+          "vs_population_index": 120
+        },
+        "return_rate": {
+          "mean": 0.09,
+          "vs_population_index": 90
+        },
+        "tenure_days": {
+          "mean": 1327.029,
+          "vs_population_index": 98
+        },
+        "age": {
+          "mean": 40.728,
+          "vs_population_index": 99
+        },
+        "discount_reliance_pct": {
+          "mean": 0.406,
+          "vs_population_index": 86
+        },
+        "avg_discount_depth": {
+          "mean": 0.228,
+          "vs_population_index": 88
+        },
+        "cart_abandonment_rate": {
+          "mean": 0.559,
+          "vs_population_index": 98
+        },
+        "session_conversion_rate": {
+          "mean": 0.32,
+          "vs_population_index": 88
+        },
+        "prob_churn_on_price_increase": {
+          "mean": 0.264,
+          "vs_population_index": 84
+        },
+        "price_elasticity": {
+          "mean": -1.145,
+          "vs_population_index": 85
+        }
+      },
+      "top_top_category": {
+        "Intimates": 0.1,
+        "Tops & Tees": 0.071,
+        "Fashion Hoodies & Sweatshirts": 0.063
+      },
+      "top_dominant_traffic_source": {
+        "Email": 0.584,
+        "Adwords": 0.303,
+        "Facebook": 0.049
+      },
+      "top_gender": {
+        "M": 0.502,
+        "F": 0.498
+      },
+      "top_country": {
+        "China": 0.341,
+        "United States": 0.219,
+        "Brasil": 0.146
+      }
+    }
+  ]
+}
